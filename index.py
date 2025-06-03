@@ -11,6 +11,7 @@ import string
 from PIL import Image
 import smtplib
 from email.mime.text import MIMEText
+from datetime import datetime, timedelta
 
 
 # Page configuration
@@ -232,7 +233,7 @@ with Projects:
 
     # st.markdown("<h1 style='text-align: center;'>💼 Projects 💼</h1>", unsafe_allow_html=True)
     
-    proj1, proj2, proj3, proj4 = st.tabs(["🍽️ BESTIE", "🌫️ US AQI Analysis", "💳 Credit Card System", "Live Weather Event Alert"])
+    proj1, proj2, proj3, proj4 = st.tabs(["🍽️ BESTIE", "🌫️ US AQI Analysis", "💳 Credit Card System", "🌩️ Live Weather Event Alert"])
     
     # ========== PROJECT 1 ==========
     with proj1:
@@ -774,7 +775,7 @@ with Projects:
         st.divider()
 
         # 3. Pipeline Architecture
-        st.markdown("<h3 style='text-align: center;'>🛤️ How Does the Data Flow Through the Pipeline?</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center;'>🛤️ How does the data flow through the pipeline?</h3>", unsafe_allow_html=True)
         st.markdown(
             """
             The architecture below shows how simulated credit card transactions flow through the data pipeline, from real-time ingestion to analytics and visualization.
@@ -898,7 +899,7 @@ with Projects:
         st.divider()
 
         # 4. Transformation, Storage, and Automation
-        st.markdown("<h3 style='text-align: center;'>🔄 How Are Transactions Ingested, Processed, Stored, and Visualized?</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center;'>🔄 How are transactions ingested, processed, stored, and visualized?</h3>", unsafe_allow_html=True)
         st.markdown(
             """
             - **Ingestion:** Kafka reads transaction data line-by-line from CSV files and sends it to a predefined topic at random intervals between 1-3 seconds.
@@ -913,7 +914,7 @@ with Projects:
         st.divider()
 
         # 5. Sample Data
-        st.markdown("<h3 style='text-align: center;'>🧐 What Does a Raw Transaction Look Like?</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center;'>🧐 What does a raw transaction look like?</h3>", unsafe_allow_html=True)
 
         # Realistic sample data based on provided example
         sample_data = pd.DataFrame({
@@ -1001,50 +1002,45 @@ with Projects:
             Total_Amount=("Amount", "sum"),
             Transaction_Count=("Amount", "count")
         ).reset_index().sort_values("Total_Amount", ascending=False)
-        st.markdown("#### 🏪 Merchant Summary (Total Amount & Transaction Count)")
+        st.markdown("#### 🏪 Merchant Summary")
         st.dataframe(merchant_summary, use_container_width=True, hide_index=True)
 
-        # 2. Daily statistics: total amount and transaction count per day
+        # 2. DAILY STATISTICS
         daily_stats = simulated_data.groupby("Date").agg(
             Total_Amount=("Amount", "sum"),
             Transaction_Count=("Amount", "count")
         ).reset_index()
+
         fig_daily = px.bar(
             daily_stats, x="Date", y="Total_Amount",
-            title="Total Transaction Amount by Day",
+            title="💰 Daily Transaction Amount",
             labels={"Total_Amount": "Total Amount (VND)", "Date": "Date"},
-            color="Total_Amount", color_continuous_scale="Blues"
+            color="Transaction_Count",  # Color based on volume
+            color_continuous_scale="Blues"
+        )
+        fig_daily.update_traces(hovertemplate='<b>Date</b>: %{x}<br>Total: %{y:,.0f} VND<br>Count: %{marker.color}')
+        fig_daily.update_layout(
+            xaxis_title="Date",
+            yaxis_title="Total Amount (VND)",
+            margin=dict(t=50, b=40),
+            height=400
         )
         st.plotly_chart(fig_daily, use_container_width=True)
 
-        # 3. Monthly statistics: total amount and transaction count per month
-        monthly_stats = simulated_data.groupby(["Year", "Month"]).agg(
-            Total_Amount=("Amount", "sum"),
-            Transaction_Count=("Amount", "count")
-        ).reset_index()
-        monthly_stats["Month_Year"] = monthly_stats["Year"].astype(str) + "-" + monthly_stats["Month"].astype(str).str.zfill(2)
-        fig_monthly = px.bar(
-            monthly_stats, x="Month_Year", y="Total_Amount",
-            title="Total Transaction Amount by Month",
-            labels={"Total_Amount": "Total Amount (VND)", "Month_Year": "Month-Year"},
-            color="Total_Amount", color_continuous_scale="Greens"
-        )
-        st.plotly_chart(fig_monthly, use_container_width=True)
 
-        # 4. Yearly statistics: total amount and transaction count per year
-        yearly_stats = simulated_data.groupby("Year").agg(
-            Total_Amount=("Amount", "sum"),
-            Transaction_Count=("Amount", "count")
-        ).reset_index()
-        fig_yearly = px.bar(
-            yearly_stats, x="Year", y="Total_Amount",
-            title="Total Transaction Amount by Year",
-            labels={"Total_Amount": "Total Amount (VND)", "Year": "Year"},
-            color="Total_Amount", color_continuous_scale="Oranges"
+        # 3. Top 10 Merchant Names (Replace Monthly Chart)
+        top_merchants = simulated_data['Merchant'].value_counts().head(10).reset_index()
+        top_merchants.columns = ['Merchant', 'Count']
+        fig_merchants = px.bar(
+            top_merchants[::-1],  # reverse for descending order
+            x='Count', y='Merchant', orientation='h',
+            title="🏪 Top 10 Merchant",
+            color='Count', color_continuous_scale='YlOrBr'
         )
-        st.plotly_chart(fig_yearly, use_container_width=True)
+        fig_merchants.update_layout(xaxis_title="Transaction Count", yaxis_title="", height=400)
+        st.plotly_chart(fig_merchants, use_container_width=True)
 
-        # 5. Pie chart: Transaction count by Merchant
+        # 4. Pie chart: Transaction count by Merchant
         merchant_counts = simulated_data["Merchant"].value_counts().reset_index()
         merchant_counts.columns = ["Merchant", "Count"]
         fig_merchant_pie = px.pie(
@@ -1055,7 +1051,7 @@ with Projects:
 
         st.divider()
 
-
+    # ========== PROJECT 4 ==========
     with proj4:
         # 🌩️ Live Weather Event Alert System
         st.markdown(
@@ -1136,53 +1132,71 @@ with Projects:
         )
 
         st.divider()
+        
+        # # --- Demo & Screenshots ---
+        # st.markdown("<h3 style='text-align: center;'>📸 Demo & Screenshots</h3>", unsafe_allow_html=True)
+        # images_urls = [
+        #     "https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/demo_dashboard.png",
+        #     "https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/demo_telegram.png",
+        #     "https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/demo_map.png"
+        # ]
+        # captions = [
+        #     "Live Dashboard: Real-time event feed and analytics",
+        #     "Email Notification: Instant severe weather alerts",
+        #     "Interactive Map: Visualize affected areas"
+        # ]
+        # img_cols = st.columns(len(images_urls))
+        # for i, url in enumerate(images_urls):
+        #     with img_cols[i]:
+        #         st.image(url, caption=captions[i], use_container_width=True)
 
-        # --- Architecture Diagram and Text ---
-        st.markdown("<h3 style='text-align: center;'>🧩 Architecture</h3>", unsafe_allow_html=True)
-        st.markdown(
-            """
-            <div style="display: flex; justify-content: center;">
-                <img src="https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/architecture.png" alt="System Architecture" style="max-width: 90%; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);"/>
-            </div>
-            """, unsafe_allow_html=True
-        )
-        st.markdown(
-            """
-        <pre style="background:#f8f8f8; border-radius:8px; padding:1rem; font-size:1rem;">
-        [Weather API] --> [Ingestion Script] --> Kafka (weather_raw)
-                                                |
-                                        Spark Streaming Job
-                                                ↓
-                                    Stores in PostgreSQL database
-                                                ↓
-                                Detects Alert Events (storm, heat, etc.)
-                                                ↓
-                            Kafka (weather_alerts) --> Streamlit Dashboard
-                                                ↓
-                                    Sends Email via SES / SMTP
-        </pre>
-            """, unsafe_allow_html=True
-        )
+        # st.divider()
+        
+        # Interactive Chart Demo
+        def load_data(limit=1000):
+            np.random.seed(42)  # For reproducibility
 
-        st.divider()
+            cities = ['Hanoi', 'Ho Chi Minh City', 'Da Nang', 'Hue', 'Can Tho']
+            weather_types = ['Clear', 'Rain', 'Thunderstorm', 'Cloudy', 'Fog']
 
-        # --- Demo & Screenshots ---
-        st.markdown("<h3 style='text-align: center;'>📸 Demo & Screenshots</h3>", unsafe_allow_html=True)
-        images_urls = [
-            "https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/demo_dashboard.png",
-            "https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/demo_telegram.png",
-            "https://raw.githubusercontent.com/trieuvisaooo/live-weather-event-alert/main/docs/demo_map.png"
-        ]
-        captions = [
-            "Live Dashboard: Real-time event feed and analytics",
-            "Email Notification: Instant severe weather alerts",
-            "Interactive Map: Visualize affected areas"
-        ]
-        img_cols = st.columns(len(images_urls))
-        for i, url in enumerate(images_urls):
-            with img_cols[i]:
-                st.image(url, caption=captions[i], use_container_width=True)
+            # Generate random timestamps within the last 7 days
+            end_time = datetime.now()
+            start_time = end_time - timedelta(days=7)
+            timestamps = [start_time + timedelta(seconds=np.random.randint(0, 7 * 24 * 3600)) for _ in range(limit)]
+            timestamps = pd.to_datetime(timestamps).tz_localize('UTC').tz_convert('Asia/Ho_Chi_Minh')
 
+            data = {
+                'timestamp': timestamps,
+                'city': np.random.choice(cities, limit),
+                'temperature': np.random.uniform(20, 40, limit).round(1),
+                'humidity': np.random.randint(40, 100, limit),
+                'wind_speed': np.random.uniform(1, 15, limit).round(2),
+                'weather': np.random.choice(weather_types, limit),
+                'is_alert': np.random.choice([False, False, False, True], limit),  # Bias to fewer alerts
+            }
+
+            df = pd.DataFrame(data)
+            df['datetime'] = df['timestamp']
+            return df
+        
+        st.markdown("<h3 style='text-align: center;'>📊 Interactive Chart Demo</h3>", unsafe_allow_html=True)
+
+        # Load sample data (reuse from earlier)
+        df = load_data(limit=500)
+
+        # Let users choose city and metric
+        city = st.selectbox("Select a city", df['city'].unique())
+        metric = st.selectbox("Select metric", ['temperature', 'humidity', 'wind_speed'])
+
+        filtered_df = df[df['city'] == city].sort_values('datetime')
+
+        if not filtered_df.empty:
+            fig = px.line(filtered_df, x='datetime', y=metric, title=f"{metric.title()} in {city}", markers=True)
+            fig.update_layout(xaxis_title="Time", yaxis_title=metric.title(), height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No data available for the selected city.")
+            
         st.divider()
 
 
