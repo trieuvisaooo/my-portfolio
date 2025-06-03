@@ -96,7 +96,7 @@ with AboutMe:
     
 
     st.divider()
-    st.markdown('<h3 style="text-align: center;">My Favorite Quote</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 style="text-align: center;">My favorite quote</h3>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
         st.markdown("""
@@ -977,7 +977,7 @@ with Projects:
         st.divider()
 
         # 6. Visual Insights
-        st.markdown("<h3 style='text-align: center;'>📈 What Surprising Insights Can We Discover?</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center;'>📈 What surprising insights can we discover?</h3>", unsafe_allow_html=True)
         st.markdown("Let's explore daily transaction volumes and merchant trends from the simulated data:")
 
         # Simulate a larger transaction dataset for demonstration
@@ -1108,7 +1108,7 @@ with Projects:
         st.divider()
 
         # --- Tech Stack Table ---
-        st.markdown("### 📦 Tech Stack")
+        st.markdown('<h3 style="text-align: center;">📦 Tech stack by layer</h3>', unsafe_allow_html=True)
         st.markdown(
             """
             <table style="width:100%; font-size:1.05rem;">
