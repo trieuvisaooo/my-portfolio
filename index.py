@@ -1240,9 +1240,9 @@ with Contact:
                 else:
                     try:
                         # Email configuration
-                        sender_email = os.environ.get('SENDER_EMAIL')
-                        receiver_email = os.environ.get('RECEIVER_EMAIL')
-                        password = os.environ.get('EMAIL_PASSWORD')
+                        sender_email = st.secrets['SENDER_EMAIL']
+                        receiver_email = st.secrets['RECEIVER_EMAIL']
+                        password = st.secrets['EMAIL_PASSWORD']
                         
                         # Create message with improved formatting
                         msg = MIMEText(f"""
@@ -1268,7 +1268,7 @@ with Contact:
                         st.success("✨ Message sent successfully! I'll get back to you soon.")
                         st.balloons()
                     except Exception as e:
-                        st.error("❌ Oops! Something went wrong. Please try again later or contact me directly via email.")
+                        st.error(f"❌ Oops! Something went wrong. Please try again later or contact me directly via email. {e}")
 
 st.markdown("""
     <div style='text-align: right;'>
