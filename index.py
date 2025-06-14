@@ -1268,7 +1268,7 @@ with Contact:
                         st.success("✨ Message sent successfully! I'll get back to you soon.")
                         st.balloons()
                     except Exception as e:
-                        st.error(f"❌ Oops! Something went wrong. Please try again later or contact me directly via email. {e}")
+                        st.error("❌ Oops! Something went wrong. Please try again later or contact me directly via email.")
 
 st.markdown("""
     <div style='text-align: right;'>
