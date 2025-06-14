@@ -12,6 +12,7 @@ from PIL import Image
 import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
+import os
 
 
 # Page configuration
@@ -1239,9 +1240,9 @@ with Contact:
                 else:
                     try:
                         # Email configuration
-                        sender_email = "trieulaobao@gmail.com"
-                        receiver_email = "khactrieu.work.2025@gmail.com"
-                        password = st.secrets["email_password"]
+                        sender_email = os.environ.get('SENDER_EMAIL')
+                        receiver_email = os.environ.get('RECEIVER_EMAIL')
+                        password = os.environ.get('EMAIL_PASSWORD')
                         
                         # Create message with improved formatting
                         msg = MIMEText(f"""
